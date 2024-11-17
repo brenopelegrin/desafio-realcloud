@@ -6,18 +6,20 @@ from server import frontend_url, db
 from models.users import User as UserModel
 from schemas.users import user_schema, users_schema
 
+from resources.auth_utils import protected_resource
+
 allowed_currencies = ['USD']
 
 def abort_if_currency_is_not_allowed(currency):
     global allowed_currencies
-    message = f"The currency `{currency}` is not allowed. Allowed currencies are: {''.join(allowed_currencies)}"
+    message = f"The currency `{currency}` is not allowed"
     if currency not in allowed_currencies:
-        abort(400, message=message) # bad request
+        abort(400, message=message, allowed_currencies=allowed_currencies) # bad request
     
 def abort_if_balance_is_invalid(balance):
     try:
         float(balance)
-    except ValueError:
+    except ValueError:  
         abort(400, message="Balance must be a number")
     
     if float(balance) < 0:
@@ -37,10 +39,12 @@ def abort_if_user_doesnt_exist(user_id):
         abort(404, message="User not found")
     
 class AllUsers(Resource):
-    def get(self, ):
+    @protected_resource
+    def get(self):
         all_users = db.session.execute(db.select(UserModel).order_by(UserModel.id)).scalars()
         return users_schema.dump(all_users)
     
+    @protected_resource
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('name', required=True, type=str, help='You need to inform the name', location='json')
@@ -68,12 +72,14 @@ class AllUsers(Resource):
             abort(500, message="A server error occured while creating the user")
     
 class UserById(Resource):
+    @protected_resource
     def get(self, user_id: int):
         abort_if_user_doesnt_exist(user_id=user_id)
         
         user = db.session.get(UserModel, user_id)
         return user_schema.dump(user)
     
+    @protected_resource
     def put(self, user_id: int):
         parser = reqparse.RequestParser()
         parser.add_argument('name', required=False, type=str, help='Changes the name', location='json')
@@ -99,7 +105,8 @@ class UserById(Resource):
             return user_schema.dump(user)
         except Exception:
             abort(500, message="A server error occured while updating the user")
-            
+    
+    @protected_resource
     def delete(self, user_id: int):
         abort_if_user_doesnt_exist(user_id=user_id)
         user = db.session.get(UserModel, user_id)
