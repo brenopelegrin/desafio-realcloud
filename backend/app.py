@@ -1,8 +1,11 @@
 import sys
-from server import app, api
-#from resources.web import ...
+import os
 
-# Set resources here
+from server import app, db, api
+from routes import setup_api_routes
+
+# Setup routes
+setup_api_routes(api)
 
 @app.route('/')
 def documentation():
@@ -12,6 +15,10 @@ def documentation():
         _type_: _description_
     """
     return "You can view the server-end documentation on <a href='https://github.com/brenopelegrin/desafio-realcloud/'>GitHub.</a>"
+
+# Create tables
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     # Set up Flask local development server
