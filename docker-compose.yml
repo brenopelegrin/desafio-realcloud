@@ -6,14 +6,14 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - pytasks-network
+      - realcloud-network
   database:
     image: postgres
     environment:
       - POSTRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_HOST_AUTH_METHOD=password
-      - POSTGRES_DB=pytasks
+      - POSTGRES_DB=hrmanager
     networks:
       - realcloud-network
 
