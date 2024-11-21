@@ -20,7 +20,7 @@ import DummyBox from '../../components/DummyBox';
 
 export default function LandingPage() {
 
-  const api_authorize_url = "https://desafio-realcloud-w5n6.onrender.com/api/oauth2/google/authorize"
+  const api_authorize_url = "https://desafio-realcloud-w5n6.onrender.com/oauth2/google/authorize"
 
   return (
     <Flex
