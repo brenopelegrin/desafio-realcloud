@@ -7,11 +7,13 @@ from sqlalchemy.orm import DeclarativeBase
 from authlib.integrations.flask_client import OAuth
 
 from dotenv import dotenv_values
+import os
 
 config = {
     #**dotenv_values(".env.shared"),  # load shared development variables
     #**dotenv_values(".env.secret"),  # load sensitive variables
     **dotenv_values(".env"),
+    **os.environ,
 }
 
 class Base(DeclarativeBase):
