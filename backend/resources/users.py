@@ -50,16 +50,19 @@ class AllUsers(Resource):
         parser.add_argument('name', required=True, type=str, help='You need to inform the name', location='json')
         parser.add_argument('balance', required=True, type=float, help='You need to inform the balance', location='json')
         parser.add_argument('currency', required=True, type=str, help='You need to inform the currency', location='json')
+        parser.add_argument('dob', required=True, type=str, help='You need to inform the date of birth', location='json')
         args = parser.parse_args()
         
         abort_if_currency_is_not_allowed(currency=args.get('currency'))
         abort_if_balance_is_invalid(balance=args.get('balance'))
         abort_if_name_is_invalid(name=args.get('name'))
+        #abort_if_dob_is_invalid(dob=args.get('dob'))
 
         new_user = UserModel(
             name = args.get('name'),
             balance = args.get('balance'),
-            currency = args.get('currency')
+            currency = args.get('currency'),
+            dob = args.get('dob')
         )
         
         try:
@@ -85,6 +88,7 @@ class UserById(Resource):
         parser.add_argument('name', required=False, type=str, help='Changes the name', location='json')
         parser.add_argument('balance', required=False, type=float, help='Changes the balance', location='json')
         parser.add_argument('currency', required=False, type=str, help='Changes the currency', location='json')
+        parser.add_argument('dob', required=False, type=str, help='Changes the date of birth', location='json')
         args = parser.parse_args()
         
         abort_if_user_doesnt_exist(user_id=user_id)        
@@ -99,6 +103,9 @@ class UserById(Resource):
         if args.get('name'):
             abort_if_name_is_invalid(name=args.get('name'))
             user.name = args.get('name')
+        if args.get('dob'):
+            #abort_if_dob_is_invalid(dob=args.get('dob'))
+            user.dob = args.get('dob')
             
         try:
             db.session.commit()

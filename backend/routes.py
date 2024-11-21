@@ -20,5 +20,5 @@ def setup_api_routes(api):
     api.add_resource(GoogleLogin, '/oauth2/google/authorize')
     api.add_resource(GoogleSuccessCallback, '/oauth2/google/callback')
     api.add_resource(GoogleLogout, '/oauth2/google/logout')
-    api.add_resource(GoogleTestProtected, '/oauth2/google/protected')
+    api.add_resource(GoogleTestProtected, '/oauth2/google/test')
     

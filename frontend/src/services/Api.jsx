@@ -1,52 +1,41 @@
 import axios from 'axios';
 
-const apiUrl = 'https://spottedcaaso-api.onrender.com'
+const apiUrl = '/api'
 
 const api = axios.create({
-    baseURL: apiUrl+'/api/v1'
+    baseURL: apiUrl
 });
 
-async function getFeed(){
-    const response = await api.get('/protected/feed')
+async function getAllUsers(){
+    const response = await api.get('/users')
     return response
 }
 
-async function postSpotted({text}){
-    const response = await api.post('/protected/spotted', {text})
+async function getUserById(id){
+    const response = await api.get('/users/'+String(id));
     return response
 }
 
-async function postAnonymousSpotted({text}){
-    const response = await api.post('/unprotected/spotted', {text}) 
+async function deleteUserById(id){
+    const response = await api.delete('/users/'+String(id));
     return response
 }
 
-async function postProtectedSpottedComment({spottedId, text}){
-    const response = await api.post('/protected/spotted/'+String(spottedId)+'/comment', {text}) 
+async function postNewUser({name, balance, dob, currency}){
+    const response = await api.post('/users', {name, balance, dob, currency})
     return response
 }
 
-async function postProtectedSpottedVote({spottedId, text}){
-    const response = await api.post('/protected/spotted/'+String(spottedId)+'/vote') 
+async function healthCheck(){
+    const response = await api.get('/health')
     return response
-}
-
-async function postProtectedSpottedReport({spottedId, text}){
-    const response = await api.post('/protected/spotted/'+String(spottedId)+'/report', {text}) 
-    return response
-}
-
-async function registerUser({email, name, username, password}){
-    const response = await api.post('/auth/register', {email, name, username, password, password_confirmation: password })
 }
 
 export {
   api,
-  getFeed,
-  postAnonymousSpotted,
-  postProtectedSpottedComment,
-  postProtectedSpottedReport,
-  postProtectedSpottedVote,
-  postSpotted,
-  registerUser,
+  deleteUserById,
+  getAllUsers,
+  getUserById,
+  healthCheck,
+  postNewUser,
 };

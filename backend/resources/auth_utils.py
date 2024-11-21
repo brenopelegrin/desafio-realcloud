@@ -12,21 +12,21 @@ def abort_if_authorization_header_is_invalid(authorization_header):
     decoded_token = None
     
     if not authorization_header:
-        abort(401, message="You must pass the JWT token in the Authorization header with the format `Bearer YOURTOKEN`")
+        abort(401, message="You must pass the JWT token in the Authorization header with the format `Bearer YOURTOKEN`", authenticated=False)
     
     try:
         str(authorization_header)
     except Exception:
-        abort(400, message="Unparseable Authorization header")
+        abort(400, message="Unparseable Authorization header", authenticated=False)
         
     if 'Bearer' not in str(authorization_header):  
-        abort(400, message="You must pass the JWT token in the Authorization header with the format `Bearer YOURTOKEN`")
+        abort(400, message="You must pass the JWT token in the Authorization header with the format `Bearer YOURTOKEN`", authenticated=False)
         
     try:
         token = authorization_header.split(' ')[1]
         decoded_token = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_DEFAULT_ALGORITHM])
     except jwt.InvalidTokenError:
-        abort(401, message="Invalid JWT token")
+        abort(401, message="Invalid JWT token", authenticated=False)
         
     return decoded_token
 
@@ -53,6 +53,6 @@ def google_token_to_JWT(google_token):
 def protected_resource(f):
     def wrapper(self, *args, **kwargs):
         authorization_header = request.headers.get('Authorization')
-        decoded_token =abort_if_authorization_header_is_invalid(authorization_header)
+        decoded_token = abort_if_authorization_header_is_invalid(authorization_header)
         return f(self, *args, **kwargs)
     return wrapper

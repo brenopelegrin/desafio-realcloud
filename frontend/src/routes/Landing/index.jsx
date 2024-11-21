@@ -2,7 +2,6 @@ import {
   AiFillGithub,
   AiOutlineGoogle,
 } from 'react-icons/ai';
-import { Link as RouteLink } from 'react-router-dom';
 
 import {
   Button,
@@ -54,7 +53,7 @@ export default function LandingPage() {
           </HStack>
         </DummyBox>
         <Stack spacing={6} direction={'row'}>
-          <RouteLink to="/login">
+          <Link href="/api/oauth2/google/authorize">
           <Button
             rounded={'full'}
             px={6}
@@ -62,13 +61,13 @@ export default function LandingPage() {
             bg={'blue.500'}
             _hover={{ bg: 'blue.600' }}>
             <HStack>
-              <Icon as={AiOutlineGoogle} boxSize={6}/>
-              <Text>
-              Entrar com Google
-              </Text>
+                <Icon as={AiOutlineGoogle} boxSize={6}/>
+                <Text>
+                Entrar com Google
+                </Text>
             </HStack>
           </Button>
-          </RouteLink>
+          </Link>
         </Stack>
       </Stack>
     </Container>

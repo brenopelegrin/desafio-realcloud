@@ -1,14 +1,9 @@
-import { ChakraProvider, Box } from '@chakra-ui/react'
-import { Navigate, Route, Routes, BrowserRouter as Router} from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-import { useContext } from 'react';
+import { ChakraProvider } from '@chakra-ui/react';
 
 import Navbar from './components/Navbar';
-import Feed from './routes/Feed';
-import Login from './routes/Login';
-import SignUp from './routes/SignUp';
-
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import GetRoutes from './routes';
 
 function App() {

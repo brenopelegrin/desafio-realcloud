@@ -24,9 +24,13 @@ class GoogleLogout(Resource):
     def get(self):
         return 200
     
+    def post(self):
+        return 200
+    
 class GoogleTestProtected(Resource):
     @protected_resource
     def get(self):
         return {
-            "message": "Your token is valid"
+            "message": "Your token is valid",
+            "authenticated": True
         }

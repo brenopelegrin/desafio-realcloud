@@ -70,7 +70,7 @@ export default function LogoutPage() {
             bg={'blue.500'}
             color={'white'}
             
-        ><RouteLink to="/feed">Voltar para o feed</RouteLink></Button> 
+        ><RouteLink to="/manage">Voltar para Gerenciar</RouteLink></Button> 
       </Stack>
     </Flex>
   );
