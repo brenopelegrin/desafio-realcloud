@@ -16,6 +16,9 @@ O frontend é um website client-side construído utilizando `JavaScript` com `Re
 A biblioteca `ChakraUI` foi escolhida devido a facilidade que ela traz para o desenvolvimento de interfaces gráficas, já que possui componentes já prontos.
 
 Foi feito o deploy da aplicação na `vercel`, e o website pode ser acessado [aqui](https://hrdotm.vercel.app)
+![image](https://github.com/user-attachments/assets/66ff589f-1682-4f65-bc1b-2d39bcf927b4)
+![image](https://github.com/user-attachments/assets/18bc0305-43f0-4d01-976e-ddd0c7da3cc6)
+
 
 ## Backend
 
