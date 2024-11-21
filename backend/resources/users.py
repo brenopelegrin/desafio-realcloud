@@ -7,8 +7,12 @@ from models.users import User as UserModel
 from schemas.users import user_schema, users_schema
 
 from resources.auth_utils import protected_resource
+import datetime
 
 allowed_currencies = ['USD']
+
+def abort_if_dob_is_invalid(dob):
+    pass
 
 def abort_if_currency_is_not_allowed(currency):
     global allowed_currencies
@@ -50,13 +54,13 @@ class AllUsers(Resource):
         parser.add_argument('name', required=True, type=str, help='You need to inform the name', location='json')
         parser.add_argument('balance', required=True, type=float, help='You need to inform the balance', location='json')
         parser.add_argument('currency', required=True, type=str, help='You need to inform the currency', location='json')
-        parser.add_argument('dob', required=True, type=str, help='You need to inform the date of birth', location='json')
+        parser.add_argument('dob', required=True, type=str, help='You need to inform the date of birth in format DD/MM/YYYY', location='json')
         args = parser.parse_args()
         
         abort_if_currency_is_not_allowed(currency=args.get('currency'))
         abort_if_balance_is_invalid(balance=args.get('balance'))
         abort_if_name_is_invalid(name=args.get('name'))
-        #abort_if_dob_is_invalid(dob=args.get('dob'))
+        abort_if_dob_is_invalid(dob=args.get('dob'))
 
         new_user = UserModel(
             name = args.get('name'),
@@ -86,7 +90,7 @@ class UserById(Resource):
     def put(self, user_id: int):
         parser = reqparse.RequestParser()
         parser.add_argument('name', required=False, type=str, help='Changes the name', location='json')
-        parser.add_argument('balance', required=False, type=float, help='Changes the balance', location='json')
+        parser.add_argument('balance', required=False, help='Changes the balance', location='json')
         parser.add_argument('currency', required=False, type=str, help='Changes the currency', location='json')
         parser.add_argument('dob', required=False, type=str, help='Changes the date of birth', location='json')
         args = parser.parse_args()
@@ -104,7 +108,7 @@ class UserById(Resource):
             abort_if_name_is_invalid(name=args.get('name'))
             user.name = args.get('name')
         if args.get('dob'):
-            #abort_if_dob_is_invalid(dob=args.get('dob'))
+            abort_if_dob_is_invalid(dob=args.get('dob'))
             user.dob = args.get('dob')
             
         try:
