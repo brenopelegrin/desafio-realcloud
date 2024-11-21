@@ -20,6 +20,8 @@ import DummyBox from '../../components/DummyBox';
 
 export default function LandingPage() {
 
+  const api_authorize_url = "https://desafio-realcloud-tk13.onrender.com/oauth2/google/authorize"
+
   return (
     <Flex
       minH={'80vh'}
@@ -53,7 +55,7 @@ export default function LandingPage() {
           </HStack>
         </DummyBox>
         <Stack spacing={6} direction={'row'}>
-          <Link href="/api/oauth2/google/authorize">
+          <Link href={api_authorize_url}>
           <Button
             rounded={'full'}
             px={6}
