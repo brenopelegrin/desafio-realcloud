@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = 'https://desafio-realcloud-tk13.onrender.com'
+const apiUrl = 'https://desafio-realcloud-w5n6.onrender.com'
 
 const api = axios.create({
     baseURL: apiUrl
