@@ -3,6 +3,7 @@ import {
   useState,
 } from 'react';
 
+import { SingleDatepicker } from 'chakra-dayzed-datepicker';
 import {
   FaEdit,
   FaPlus,
@@ -55,6 +56,7 @@ import {
 } from '@chakra-ui/react';
 
 import {
+  changeUserById,
   deleteUserById,
   getAllUsers,
   postNewUser,
@@ -65,13 +67,22 @@ export default function Feed() {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
     const { colorMode, toggleColorMode } = useColorMode();
     const { isOpen: isCreatorOpen, onOpen: onCreatorOpen, onClose: onCreatorClose } = useDisclosure();
+    const { isOpen: isEditorOpen, onOpen: onEditorOpen, onClose: onEditorClose } = useDisclosure();
 
-    const [newPersonName, setNewPersonName] = useState('');
-    const [newPersonBalance, setNewPersonBalance] = useState('');
-    const [newPersonDOB, setNewPersonDOB] = useState('');
+    const [newPersonName, setNewPersonName] = useState('John Doe');
+    const [newPersonBalance, setNewPersonBalance] = useState('0.00');
+    const [newPersonDOB, setNewPersonDOB] = useState(new Date());
+
+    const [currPersonName, setCurrPersonName] = useState('');
+    const [currPersonBalance, setCurrPersonBalance] = useState('0.00');
+    const [currPersonDOB, setCurrPersonDOB] = useState(new Date());
+    const [currPersonId, setCurrPersonId] = useState(0);
+
+    const [currExchangeRate, setCurrExchangeRate] = useState(0);
+    const [currExchangeCalcId, setCurrExchangeCalcId] = useState(0);
+    const [currExchangeValue, setCurrExchangeValue] = useState(0);
 
     const [spottedAnonymous, setSpottedAnonymous] = useState(false);
     const [infoBox, setInfoBox] = useState(<></>);
@@ -98,8 +109,7 @@ export default function Feed() {
         )
       }
     
-    
-      async function handleNewPersonSubmit(newPersonName, newPersonBalance, newPersonDOB){
+      async function handleNewPersonSubmit(){
         setInfoBox(waitingServer())
 
         const newData = {
@@ -108,17 +118,46 @@ export default function Feed() {
           dob: newPersonDOB,
           currency: 'USD'
         }
-
-        const response = await postNewUser(newData);
         
-        if(response.status == 200){
-          onCreatorClose();
-          setInfoBox(<></>);
-          fetchUsers();
-        } else {
-          setInfoBox(serverError())
+        try {
+            const response = await postNewUser(newData);
+            onCreatorClose();
+            setInfoBox(<></>);
+            fetchUsers();
+        } catch (err) {
+            setInfoBox(serverError())
+            console.log(err)
         }
       }
+
+      async function handleEditPersonSubmit(){
+        setInfoBox(waitingServer())
+
+        const newData = {
+          name: currPersonName,
+          balance: currPersonBalance,
+          dob: currPersonDOB,
+          currency: 'USD'
+        }
+
+        try{
+            const response = await changeUserById(currPersonId, newData);
+            onEditorClose();
+            setInfoBox(<></>);
+            fetchUsers();
+        } catch (err) {
+            setInfoBox(serverError())
+            console.log(err)
+        }
+      }
+
+    const handleExchangeCalcSubmit = () => {
+        const id = parseInt(currExchangeCalcId);
+        const user = filteredUsers.find((user) => user.id === id);
+        const balance = Number(user.balance);
+        const value_brl = Number(currExchangeRate) * balance;
+        setCurrExchangeValue(value_brl.toFixed(6));
+    }
 
     useEffect(() => {
       fetchUsers();
@@ -133,7 +172,6 @@ export default function Feed() {
     };
   
     const handleDelete = async (id) => {
-      console.log(`Delete user with ID: ${id}`);
       // Add your delete logic here
       const response = await deleteUserById(id);
       await fetchUsers();
@@ -141,7 +179,12 @@ export default function Feed() {
   
     const handleEdit = (id) => {
       console.log(`Edit user with ID: ${id}`);
-      // Add your edit logic here
+      const user = users.find((user) => user.id === id);
+      setCurrPersonId(id);
+      setCurrPersonName(user.name);
+      setCurrPersonBalance(user.balance);
+      setCurrPersonDOB(user.dob);
+      onEditorOpen();
     };
   
     const handleSearch = () => {
@@ -172,6 +215,7 @@ export default function Feed() {
           <InputGroup maxW="400px">
             <Input
               placeholder="Procurar por nomne"
+              isDisabled={true}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -180,6 +224,7 @@ export default function Feed() {
                 aria-label="Procurar"
                 icon={<FaSearch />}
                 size="sm"
+                isDisabled={true}
                 onClick={handleSearch}
               />
             </InputRightElement>
@@ -254,6 +299,27 @@ export default function Feed() {
             </Tbody>
           </Table>
         </TableContainer>
+        <HStack paddingTop="10px" align="left" width="100%" flexDirection="row" justifyContent="left" gap="50px">
+            <VStack align="left" maxWidth="150px">
+                <Text>ID:</Text>
+                <Input onChange={(e) => setCurrExchangeCalcId(e.target.value)}>
+                </Input>
+            </VStack>
+            <VStack align="left" maxWidth="250px">
+                <Text>Taxa de câmbio (BRL):</Text>
+                <HStack>
+                <Input maWidth="150px" placeholder={currExchangeRate} onChange={event => setCurrExchangeRate(Number(event.currentTarget.value))}>
+                </Input>
+                    <Button width="150px" onClick={handleExchangeCalcSubmit}>Calcular</Button>  
+                </HStack>
+            </VStack>
+            <VStack align="left" maxWidth="200px">
+            </VStack>
+            <VStack align="left" maxWidth="250px">
+                <Text>Resultado:</Text>
+                <Text>{currExchangeValue}</Text>
+            </VStack>
+        </HStack>
       <Modal onClose={onCreatorClose} isOpen={isCreatorOpen} isCentered>
       <ModalOverlay />
       <ModalContent>
@@ -264,13 +330,13 @@ export default function Feed() {
               <FormControl isRequired id="text">
                 <Text>Nome</Text>
                 <Input 
-                  placeholder='John Doe...' 
-                  onBlur = {event => setNewPersonName(event.currentTarget.value)}
+                  placeholder={newPersonName} 
+                  onChange = {event => setNewPersonName(event.currentTarget.value)}
                 />
               </FormControl>
               <FormControl isRequired id="balance">
                 <Text>Valor (USD)</Text>
-                <NumberInput defaultValue={0} min={0} max={1000000000} precision={2}>
+                <NumberInput defaultValue={newPersonBalance} min={0} max={1000000000} precision={2}>
                     <NumberInputField 
                         onChange={event => setNewPersonBalance(event.currentTarget.value)}
                     />
@@ -282,9 +348,10 @@ export default function Feed() {
             </FormControl>
             <FormControl isRequired id="dob">
                 <Text>Data de nascimento</Text>
-                <Input 
-                  placeholder='01/01/1999' 
-                  onBlur = {event => setNewPersonDOB(event.currentTarget.value)}
+                <SingleDatepicker
+                    name="dob"
+                    date={newPersonDOB}
+                    onDateChange={setNewPersonDOB}
                 />
             </FormControl>
             </Flex>
@@ -292,7 +359,7 @@ export default function Feed() {
           <ModalFooter>
           <Flex gap={4} flexDirection="row" justify="space-between">
             <FormControl>
-              <Button id="closeSpottedCreator" onClick={onCreatorClose}>
+              <Button id="closePersonCreator" onClick={onCreatorClose}>
                 <Flex align="center" flexDirection="row" gap={2}>
                   <SmallCloseIcon/>
                   <Text>Fechar</Text>
@@ -300,10 +367,68 @@ export default function Feed() {
               </Button>
             </FormControl>
             <FormControl>
-              <Button id="sendSpotted" type="button" onClick={() => handleNewPersonSubmit(newPersonName, newPersonBalance, newPersonDOB)}>
+              <Button id="sendPerson" type="button" onClick={handleNewPersonSubmit}>
                 <Flex align="center" flexDirection="row" gap={2}>
                 <EditIcon/>
                 <Text>Criar</Text>
+                </Flex>
+              </Button>
+            </FormControl>
+          </Flex>
+          </ModalFooter>
+      </ModalContent>
+      </Modal>
+      <Modal onClose={onEditorClose} isOpen={isEditorOpen} isCentered>
+      <ModalOverlay />
+      <ModalContent>
+          <ModalHeader bg={useColorModeValue('gray.200', 'gray.600')}>Editar pessoa (id={currPersonId}) <ModalCloseButton /></ModalHeader>
+          <ModalBody>
+            <Flex flexDirection="column" gap={4} pt={4}>
+              {infoBox}
+              <FormControl isRequired id="text">
+                <Text>Nome</Text>
+                <Input 
+                  placeholder={currPersonName} 
+                  onChange = {event => setCurrPersonName(event.currentTarget.value)}
+                />
+              </FormControl>
+              <FormControl isRequired id="balance">
+                <Text>Valor (USD)</Text>
+                <NumberInput defaultValue={currPersonBalance} min={0} max={1000000000} precision={2}>
+                    <NumberInputField 
+                        onChange={event => setCurrPersonBalance(event.currentTarget.value)}
+                    />
+                    <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                    </NumberInputStepper>
+                </NumberInput>
+            </FormControl>
+            <FormControl isRequired id="dob">
+                <Text>Data de nascimento</Text>
+                <SingleDatepicker
+                    name="dob"
+                    date={currPersonDOB}
+                    onDateChange={setCurrPersonDOB}
+                />
+            </FormControl>
+            </Flex>
+          </ModalBody>
+          <ModalFooter>
+          <Flex gap={4} flexDirection="row" justify="space-between">
+            <FormControl>
+              <Button id="closePersonEditor" onClick={onEditorClose}>
+                <Flex align="center" flexDirection="row" gap={2}>
+                  <SmallCloseIcon/>
+                  <Text>Fechar</Text>
+                </Flex>
+              </Button>
+            </FormControl>
+            <FormControl>
+            <Button id="editPerson" type="button" onClick={handleEditPersonSubmit}>
+                <Flex align="center" flexDirection="row" gap={2}>
+                <EditIcon/>
+                <Text>Editar</Text>
                 </Flex>
               </Button>
             </FormControl>

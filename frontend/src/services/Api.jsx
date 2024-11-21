@@ -16,6 +16,12 @@ async function getUserById(id){
     return response
 }
 
+async function changeUserById(id, {name, balance, dob, currency}){
+    console.log("sending change req", {id, name, balance, dob, currency});
+    const response = await api.put('/users/'+String(id), {name, balance, dob, currency});
+    return response
+}
+
 async function deleteUserById(id){
     const response = await api.delete('/users/'+String(id));
     return response
@@ -33,6 +39,7 @@ async function healthCheck(){
 
 export {
   api,
+  changeUserById,
   deleteUserById,
   getAllUsers,
   getUserById,

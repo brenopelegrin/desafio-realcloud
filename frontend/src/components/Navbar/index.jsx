@@ -13,10 +13,12 @@ import {
 import {
   AddIcon,
   CloseIcon,
+  EditIcon,
   HamburgerIcon,
   Icon,
   MoonIcon,
   SettingsIcon,
+  SmallCloseIcon,
   SunIcon,
 } from '@chakra-ui/icons';
 import {
@@ -27,6 +29,8 @@ import {
   Box,
   Button,
   Flex,
+  FormControl,
+  FormLabel,
   Hide,
   HStack,
   IconButton,
@@ -35,8 +39,17 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Stack,
+  Switch,
   Text,
+  Textarea,
   useColorMode,
   useColorModeValue,
   useDisclosure,
@@ -159,15 +172,7 @@ export default function Navbar() {
   const getCreateButton = (signed) => {
     if(signed){
       return(
-          <Button
-          variant={'solid'}
-          colorScheme={'gray'}
-          size={'sm'}
-          mr={4}
-          onClick={onCreatorOpen}
-          leftIcon={<AddIcon />}>
-          Criar
-        </Button>
+        <></>
       )
     }
   }
@@ -231,6 +236,55 @@ export default function Navbar() {
           </Hide>
         ) : null}
       </Box>
+
+      <Modal onClose={onCreatorClose} isOpen={isCreatorOpen} isCentered>
+      <ModalOverlay />
+      <ModalContent>
+          <ModalHeader bg={useColorModeValue('gray.200', 'gray.600')}>Criar novo Spotted <ModalCloseButton /></ModalHeader>
+          <ModalBody>
+            <Flex flexDirection="column" gap={4} pt={4}>
+              {infoBox}
+              <FormControl isRequired id="text">
+                <Textarea 
+                  placeholder='Digite aqui algo bem curioso...' 
+                  onBlur = {event => setSpottedText(event.currentTarget.value)}
+                  />
+              </FormControl>
+              <FormControl display='flex' alignItems='center'>
+                <FormLabel htmlFor='is-anonymous' mb='0'>
+                  Mensagem anônima
+                </FormLabel>
+                <Switch 
+                  disabled
+                  id='is-anonymous'
+                  isChecked={spottedAnonymous}
+                  onChange={() => setSpottedAnonymous(current => !current)}
+                  />
+              </FormControl>
+            </Flex>
+          </ModalBody>
+          <ModalFooter>
+          <Flex gap={4} flexDirection="row" justify="space-between">
+            <FormControl>
+              <Button id="closeSpottedCreator" onClick={onCreatorClose}>
+                <Flex align="center" flexDirection="row" gap={2}>
+                  <SmallCloseIcon/>
+                  <Text>Fechar</Text>
+                </Flex>
+              </Button>
+            </FormControl>
+            <FormControl>
+              <Button id="sendSpotted" type="button" onClick={() => handleSpottedSubmit(spottedText, spottedAnonymous)}>
+                <Flex align="center" flexDirection="row" gap={2}>
+                <EditIcon/>
+                <Text>Enviar</Text>
+                </Flex>
+              </Button>
+            </FormControl>
+          </Flex>
+          </ModalFooter>
+      </ModalContent>
+      </Modal>
     </>
   );
 }
