@@ -17,7 +17,6 @@ async function getUserById(id){
 }
 
 async function changeUserById(id, {name, balance, dob, currency}){
-    console.log("sending change req", {id, name, balance, dob, currency});
     const response = await api.put('/users/'+String(id), {name, balance, dob, currency});
     return response
 }

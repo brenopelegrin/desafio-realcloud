@@ -178,7 +178,6 @@ export default function Feed() {
     };
   
     const handleEdit = (id) => {
-      console.log(`Edit user with ID: ${id}`);
       const user = users.find((user) => user.id === id);
       setCurrPersonId(id);
       setCurrPersonName(user.name);
@@ -192,11 +191,6 @@ export default function Feed() {
         user.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredUsers(filtered);
-    };
-  
-    const handleAdd = () => {
-      console.log("Add new user");
-      // Add logic to add a new user (e.g., open a modal)
     };
   
     const handleReload = async () => {
@@ -215,7 +209,6 @@ export default function Feed() {
           <InputGroup maxW="400px">
             <Input
               placeholder="Procurar por nomne"
-              isDisabled={true}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -224,7 +217,6 @@ export default function Feed() {
                 aria-label="Procurar"
                 icon={<FaSearch />}
                 size="sm"
-                isDisabled={true}
                 onClick={handleSearch}
               />
             </InputRightElement>
