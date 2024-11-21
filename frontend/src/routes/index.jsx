@@ -11,7 +11,6 @@ import { useAuth } from '../contexts/AuthContext';
 import Feed from './Feed';
 import GoogleCallbackPage from './GoogleCallback';
 import LandingPage from './Landing';
-import Login from './Login';
 import Logout from './Logout';
 import NotFound from './NotFound';
 import Profile from './Profile';
@@ -29,7 +28,7 @@ export default function GetRoutes(){
             <Route exact path="/manage" element={<Feed/>}/>
             <Route exact path="/profile" element={<Profile/>}/>
 
-            <Route path='/login' element={<Navigate to="/"/>}/>
+            <Route path='/login' element={<Navigate to="/manage"/>}/>
             <Route path="/logout" element={<Logout/>}/>
             <Route path="/oauth2/google/callback" element={<GoogleCallbackPage/>}/>
         </Routes>
@@ -40,8 +39,8 @@ export default function GetRoutes(){
             <Route path='*' element={<NotFound />}/>
             <Route exact path="/" element={<LandingPage/>}/>
 
-            <Route exact path="/manage" element={<Login/>}/>
-            <Route exact path="/login" element={<Login/>}/>
+            <Route exact path="/manage" element={<Navigate to="/oauth2/google/callback"/>}/>
+            <Route exact path="/login" element={<Navigate to="/oauth2/google/callback"/>}/>
             <Route path="/oauth2/google/callback" element={<GoogleCallbackPage/>}/>
         </Routes>
     )
